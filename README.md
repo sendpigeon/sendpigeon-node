@@ -1,4 +1,4 @@
-# sendpigeon
+# sendpigeon-node
 
 Official Node.js SDK for [SendPigeon](https://sendpigeon.dev) email API.
 

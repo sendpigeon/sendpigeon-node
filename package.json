@@ -1,0 +1,38 @@
+{
+	"name": "sendpigeon",
+	"version": "0.1.0",
+	"description": "Official Node.js SDK for SendPigeon email API",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": ["dist"],
+	"scripts": {
+		"build": "tsc",
+		"test": "vitest",
+		"test:run": "vitest run",
+		"lint": "tsc --noEmit",
+		"prepublishOnly": "npm run build"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sendpigeon/sendpigeon-js.git"
+	},
+	"homepage": "https://sendpigeon.dev/docs",
+	"bugs": "https://github.com/sendpigeon/sendpigeon-js/issues",
+	"keywords": ["email", "transactional", "api", "sendpigeon"],
+	"author": "SendPigeon",
+	"license": "MIT",
+	"engines": {
+		"node": ">=18"
+	},
+	"devDependencies": {
+		"typescript": "^5.7.0",
+		"vitest": "^2.1.0"
+	}
+}
