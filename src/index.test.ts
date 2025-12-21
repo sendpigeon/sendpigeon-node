@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { SendPigeon, SendPigeonError, type Template } from "./index.js";
+import { SendPigeon, type Template } from "./index.js";
 
 describe("SendPigeon", () => {
 	it("has send method", () => {
@@ -123,7 +123,7 @@ describe("send", () => {
 		);
 	});
 
-	it("returns email response", async () => {
+	it("returns data on success", async () => {
 		mockFetch.mockResolvedValueOnce({
 			ok: true,
 			json: () =>
@@ -135,27 +135,19 @@ describe("send", () => {
 		});
 
 		const client = new SendPigeon("test-key");
-		const result = await client.send({
+		const { data, error } = await client.send({
 			from: "test@example.com",
 			to: "recipient@example.com",
 			subject: "Test",
 			html: "<p>Hello</p>",
 		});
 
-		expect(result).toEqual({
+		expect(error).toBeNull();
+		expect(data).toEqual({
 			id: "email-123",
 			status: "pending",
 			suppressed: ["blocked@example.com"],
 		});
-	});
-});
-
-describe("SendPigeonError", () => {
-	it("has status property", () => {
-		const error = new SendPigeonError("Not found", 404);
-		expect(error.status).toBe(404);
-		expect(error.message).toBe("Not found");
-		expect(error.name).toBe("SendPigeonError");
 	});
 });
 
@@ -171,7 +163,7 @@ describe("error handling", () => {
 		mockFetch.mockReset();
 	});
 
-	it("throws SendPigeonError for non-2xx responses", async () => {
+	it("returns error for non-2xx responses", async () => {
 		mockFetch.mockResolvedValueOnce({
 			ok: false,
 			status: 401,
@@ -179,15 +171,18 @@ describe("error handling", () => {
 		});
 
 		const client = new SendPigeon("bad-key");
+		const { data, error } = await client.send({
+			from: "test@example.com",
+			to: "recipient@example.com",
+			subject: "Test",
+			html: "<p>Hello</p>",
+		});
 
-		await expect(
-			client.send({
-				from: "test@example.com",
-				to: "recipient@example.com",
-				subject: "Test",
-				html: "<p>Hello</p>",
-			}),
-		).rejects.toThrow(SendPigeonError);
+		expect(data).toBeNull();
+		expect(error).toEqual({
+			message: "Invalid API key",
+			status: 401,
+		});
 	});
 
 	it("includes error message from response", async () => {
@@ -198,19 +193,16 @@ describe("error handling", () => {
 		});
 
 		const client = new SendPigeon("test-key");
+		const { data, error } = await client.send({
+			from: "test@example.com",
+			to: "recipient@example.com",
+			subject: "Test",
+			html: "<p>Hello</p>",
+		});
 
-		try {
-			await client.send({
-				from: "test@example.com",
-				to: "recipient@example.com",
-				subject: "Test",
-				html: "<p>Hello</p>",
-			});
-		} catch (e) {
-			expect(e).toBeInstanceOf(SendPigeonError);
-			expect((e as SendPigeonError).message).toBe("Invalid email format");
-			expect((e as SendPigeonError).status).toBe(400);
-		}
+		expect(data).toBeNull();
+		expect(error?.message).toBe("Invalid email format");
+		expect(error?.status).toBe(400);
 	});
 
 	it("handles json parse failure", async () => {
@@ -221,19 +213,32 @@ describe("error handling", () => {
 		});
 
 		const client = new SendPigeon("test-key");
+		const { data, error } = await client.send({
+			from: "test@example.com",
+			to: "recipient@example.com",
+			subject: "Test",
+			html: "<p>Hello</p>",
+		});
 
-		try {
-			await client.send({
-				from: "test@example.com",
-				to: "recipient@example.com",
-				subject: "Test",
-				html: "<p>Hello</p>",
-			});
-		} catch (e) {
-			expect(e).toBeInstanceOf(SendPigeonError);
-			expect((e as SendPigeonError).message).toBe("Request failed: 500");
-			expect((e as SendPigeonError).status).toBe(500);
-		}
+		expect(data).toBeNull();
+		expect(error?.message).toBe("Request failed: 500");
+		expect(error?.status).toBe(500);
+	});
+
+	it("handles network errors", async () => {
+		mockFetch.mockRejectedValueOnce(new Error("Network error"));
+
+		const client = new SendPigeon("test-key");
+		const { data, error } = await client.send({
+			from: "test@example.com",
+			to: "recipient@example.com",
+			subject: "Test",
+			html: "<p>Hello</p>",
+		});
+
+		expect(data).toBeNull();
+		expect(error?.message).toBe("Network error");
+		expect(error?.status).toBe(0);
 	});
 });
 
@@ -277,13 +282,14 @@ describe("templates", () => {
 		});
 
 		const client = new SendPigeon("test-key");
-		const templates = await client.templates.list();
+		const { data, error } = await client.templates.list();
 
 		expect(mockFetch).toHaveBeenCalledWith(
 			"https://api.sendpigeon.dev/v1/templates",
 			expect.objectContaining({ method: "GET" }),
 		);
-		expect(templates).toEqual([mockTemplate]);
+		expect(error).toBeNull();
+		expect(data).toEqual([mockTemplate]);
 	});
 
 	it("create makes POST to /v1/templates", async () => {
@@ -294,7 +300,7 @@ describe("templates", () => {
 		});
 
 		const client = new SendPigeon("test-key");
-		const template = await client.templates.create({
+		const { data } = await client.templates.create({
 			name: "welcome-email",
 			subject: "Welcome {{name}}!",
 			html: "<p>Hello {{name}}</p>",
@@ -311,7 +317,7 @@ describe("templates", () => {
 				}),
 			}),
 		);
-		expect(template).toEqual(mockTemplate);
+		expect(data).toEqual(mockTemplate);
 	});
 
 	it("get makes GET to /v1/templates/{id}", async () => {
@@ -322,13 +328,13 @@ describe("templates", () => {
 		});
 
 		const client = new SendPigeon("test-key");
-		const template = await client.templates.get("tpl_abc123");
+		const { data } = await client.templates.get("tpl_abc123");
 
 		expect(mockFetch).toHaveBeenCalledWith(
 			"https://api.sendpigeon.dev/v1/templates/tpl_abc123",
 			expect.objectContaining({ method: "GET" }),
 		);
-		expect(template).toEqual(mockTemplate);
+		expect(data).toEqual(mockTemplate);
 	});
 
 	it("update makes PATCH to /v1/templates/{id}", async () => {
@@ -340,7 +346,7 @@ describe("templates", () => {
 		});
 
 		const client = new SendPigeon("test-key");
-		const template = await client.templates.update("tpl_abc123", {
+		const { data } = await client.templates.update("tpl_abc123", {
 			subject: "Updated subject",
 		});
 
@@ -351,7 +357,7 @@ describe("templates", () => {
 				body: JSON.stringify({ subject: "Updated subject" }),
 			}),
 		);
-		expect(template).toEqual(updatedTemplate);
+		expect(data).toEqual(updatedTemplate);
 	});
 
 	it("delete makes DELETE to /v1/templates/{id}", async () => {
@@ -361,15 +367,16 @@ describe("templates", () => {
 		});
 
 		const client = new SendPigeon("test-key");
-		await client.templates.delete("tpl_abc123");
+		const { error } = await client.templates.delete("tpl_abc123");
 
 		expect(mockFetch).toHaveBeenCalledWith(
 			"https://api.sendpigeon.dev/v1/templates/tpl_abc123",
 			expect.objectContaining({ method: "DELETE" }),
 		);
+		expect(error).toBeNull();
 	});
 
-	it("throws SendPigeonError for 404 on get", async () => {
+	it("returns error for 404 on get", async () => {
 		mockFetch.mockResolvedValueOnce({
 			ok: false,
 			status: 404,
@@ -377,9 +384,12 @@ describe("templates", () => {
 		});
 
 		const client = new SendPigeon("test-key");
+		const { data, error } = await client.templates.get("nonexistent");
 
-		await expect(client.templates.get("nonexistent")).rejects.toThrow(
-			SendPigeonError,
-		);
+		expect(data).toBeNull();
+		expect(error).toEqual({
+			message: "Template not found",
+			status: 404,
+		});
 	});
 });

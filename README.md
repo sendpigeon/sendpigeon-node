@@ -15,16 +15,26 @@ import { SendPigeon } from "sendpigeon";
 
 const pigeon = new SendPigeon("your-api-key");
 
-// Send email
-const { id, status } = await pigeon.send({
+const { data, error } = await pigeon.send({
   from: "hello@yourdomain.com",
   to: "user@example.com",
   subject: "Hello!",
   html: "<p>Welcome aboard.</p>",
 });
 
-// With template
-await pigeon.send({
+if (error) {
+  console.log(error.message); // "Domain not verified"
+  console.log(error.status);  // 403
+  return;
+}
+
+console.log(data.id); // "email_abc123"
+```
+
+### With template
+
+```typescript
+const { data, error } = await pigeon.send({
   from: "hello@yourdomain.com",
   to: "user@example.com",
   templateId: "welcome-template",
@@ -38,10 +48,10 @@ Manage email templates programmatically:
 
 ```typescript
 // List all templates
-const templates = await pigeon.templates.list();
+const { data: templates } = await pigeon.templates.list();
 
 // Create a template
-const template = await pigeon.templates.create({
+const { data: template } = await pigeon.templates.create({
   name: "welcome-email",
   subject: "Welcome {{name}}!",
   html: "<p>Hello {{name}}, welcome to {{company}}!</p>",
@@ -49,7 +59,7 @@ const template = await pigeon.templates.create({
 });
 
 // Get a template by ID
-const template = await pigeon.templates.get("tpl_abc123");
+const { data: template } = await pigeon.templates.get("tpl_abc123");
 
 // Update a template
 await pigeon.templates.update("tpl_abc123", {
@@ -61,21 +71,6 @@ await pigeon.templates.delete("tpl_abc123");
 ```
 
 Template names must be lowercase alphanumeric with dashes (e.g., `welcome-email`). Variables use `{{variableName}}` syntax and are auto-detected from subject/html/text.
-
-## Error handling
-
-```typescript
-import { SendPigeon, SendPigeonError } from "sendpigeon";
-
-try {
-  await pigeon.send({ ... });
-} catch (err) {
-  if (err instanceof SendPigeonError) {
-    console.log(err.message); // "Domain not verified"
-    console.log(err.status);  // 403
-  }
-}
-```
 
 ## Configuration
 

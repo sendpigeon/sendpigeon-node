@@ -63,24 +63,18 @@ export type UpdateTemplateRequest = {
 	text?: string | null;
 };
 
-export type SendPigeonConfig = {
-	apiKey: string;
-	baseUrl?: string;
-};
-
 export type SendPigeonOptions = {
 	baseUrl?: string;
 };
 
-export class SendPigeonError extends Error {
-	readonly status: number;
+export type SendPigeonError = {
+	message: string;
+	status: number;
+};
 
-	constructor(message: string, status: number) {
-		super(message);
-		this.name = "SendPigeonError";
-		this.status = status;
-	}
-}
+export type Result<T> =
+	| { data: T; error: null }
+	| { data: null; error: SendPigeonError };
 
 async function parseErrorMessage(response: Response): Promise<string> {
 	try {
@@ -98,27 +92,38 @@ async function request<T>(
 	path: string,
 	body?: unknown,
 	headers?: Record<string, string>,
-): Promise<T> {
-	const response = await fetch(`${baseUrl}${path}`, {
-		method,
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${apiKey}`,
-			...headers,
-		},
-		body: body ? JSON.stringify(body) : undefined,
-	});
+): Promise<Result<T>> {
+	try {
+		const response = await fetch(`${baseUrl}${path}`, {
+			method,
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${apiKey}`,
+				...headers,
+			},
+			body: body ? JSON.stringify(body) : undefined,
+		});
 
-	if (!response.ok) {
-		const message = await parseErrorMessage(response);
-		throw new SendPigeonError(message, response.status);
+		if (!response.ok) {
+			const message = await parseErrorMessage(response);
+			return { data: null, error: { message, status: response.status } };
+		}
+
+		if (response.status === 204) {
+			return { data: undefined as T, error: null };
+		}
+
+		const data = (await response.json()) as T;
+		return { data, error: null };
+	} catch (err) {
+		return {
+			data: null,
+			error: {
+				message: err instanceof Error ? err.message : "Unknown error",
+				status: 0,
+			},
+		};
 	}
-
-	if (response.status === 204) {
-		return undefined as T;
-	}
-
-	return response.json() as Promise<T>;
 }
 
 export class SendPigeon {
@@ -126,11 +131,14 @@ export class SendPigeon {
 	private readonly baseUrl: string;
 
 	readonly templates: {
-		list: () => Promise<Template[]>;
-		create: (data: CreateTemplateRequest) => Promise<Template>;
-		get: (id: string) => Promise<Template>;
-		update: (id: string, data: UpdateTemplateRequest) => Promise<Template>;
-		delete: (id: string) => Promise<void>;
+		list: () => Promise<Result<Template[]>>;
+		create: (data: CreateTemplateRequest) => Promise<Result<Template>>;
+		get: (id: string) => Promise<Result<Template>>;
+		update: (
+			id: string,
+			data: UpdateTemplateRequest,
+		) => Promise<Result<Template>>;
+		delete: (id: string) => Promise<Result<void>>;
 	};
 
 	constructor(apiKey: string, options?: SendPigeonOptions) {
@@ -164,19 +172,14 @@ export class SendPigeon {
 					data,
 				),
 			delete: (id) =>
-				request<void>(
-					this.baseUrl,
-					this.apiKey,
-					"DELETE",
-					`/v1/templates/${id}`,
-				),
+				request<void>(this.baseUrl, this.apiKey, "DELETE", `/v1/templates/${id}`),
 		};
 	}
 
 	send(
 		email: SendEmailRequest,
 		options?: SendEmailOptions,
-	): Promise<SendEmailResponse> {
+	): Promise<Result<SendEmailResponse>> {
 		return request<SendEmailResponse>(
 			this.baseUrl,
 			this.apiKey,
@@ -190,14 +193,4 @@ export class SendPigeon {
 			},
 		);
 	}
-}
-
-/** @deprecated Use `new SendPigeon(apiKey, options)` instead */
-export function createSendPigeon(
-	config: SendPigeonConfig | string,
-): SendPigeon {
-	const apiKey = typeof config === "string" ? config : config.apiKey;
-	const baseUrl =
-		typeof config === "string" ? undefined : config.baseUrl;
-	return new SendPigeon(apiKey, { baseUrl });
 }
