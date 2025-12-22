@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- Domains API: list, create, get, verify, delete
+- API Keys API: list, create, delete
+- Types generated from OpenAPI schema
+
 ## 1.1.0
 
 - Attachments support: `content` (base64) or `path` (URL)

@@ -255,6 +255,7 @@ describe("templates", () => {
 		html: "<p>Hello {{name}}</p>",
 		text: null,
 		variables: ["name"],
+		domain: null,
 		createdAt: "2024-01-15T10:30:00Z",
 		updatedAt: "2024-01-15T10:30:00Z",
 	};

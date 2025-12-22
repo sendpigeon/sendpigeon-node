@@ -1,67 +1,52 @@
+import type { components } from "./generated/schema.js";
+
 const DEFAULT_BASE_URL = "https://api.sendpigeon.dev";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
-export type Attachment = {
-	filename: string;
-	contentType?: string;
-} & ({ content: string } | { path: string });
+// Re-export generated types with friendly names
+export type SendEmailRequest = components["schemas"]["SendEmailRequest"];
+export type SendEmailResponse = components["schemas"]["SendEmailResponse"];
+export type Template = components["schemas"]["Template"];
+export type CreateTemplateRequest = components["schemas"]["CreateTemplateRequest"];
+export type UpdateTemplateRequest = components["schemas"]["UpdateTemplateRequest"];
+export type AttachmentInput = components["schemas"]["AttachmentInput"];
 
-export type SendEmailRequest = {
-	from: string;
-	to: string | string[];
-	cc?: string | string[];
-	bcc?: string | string[];
-	subject?: string;
-	html?: string;
-	text?: string;
-	replyTo?: string;
-	templateId?: string;
-	variables?: Record<string, string>;
-	attachments?: Attachment[];
+// Domain types
+export type Domain = components["schemas"]["Domain"];
+export type DomainListItem = components["schemas"]["DomainListItem"];
+export type DomainWithDnsRecords = components["schemas"]["DomainWithDnsRecords"];
+export type DomainVerificationResult =
+	components["schemas"]["DomainVerificationResult"];
+export type DnsRecord = components["schemas"]["DnsRecord"];
+
+/** Options for creating a new domain */
+export type CreateDomainOptions = {
+	/** Domain name (e.g. "mail.example.com") */
+	name: string;
 };
 
+// API Key types
+export type ApiKey = components["schemas"]["ApiKey"];
+export type ApiKeyWithSecret = components["schemas"]["ApiKeyWithSecret"];
+
+/** Options for creating a new API key */
+export type CreateApiKeyOptions = {
+	/** Human-readable name for this key */
+	name: string;
+	/** live = production emails, test = sandbox (default: live) */
+	mode?: "live" | "test";
+	/** full_access = all endpoints, sending = only /v1/emails (default: full_access) */
+	permission?: "full_access" | "sending";
+	/** ISO datetime when key expires (optional) */
+	expiresAt?: string;
+	/** Restrict key to send only from this domain (optional) */
+	domainId?: string;
+};
+
+// SDK-specific types
 export type SendEmailOptions = {
 	idempotencyKey?: string;
-};
-
-export type EmailStatus =
-	| "pending"
-	| "sent"
-	| "delivered"
-	| "bounced"
-	| "complained"
-	| "failed";
-
-export type SendEmailResponse = {
-	id: string;
-	status: EmailStatus;
-	suppressed?: string[];
-};
-
-export type Template = {
-	id: string;
-	name: string;
-	subject: string;
-	html: string | null;
-	text: string | null;
-	variables: string[];
-	createdAt: string;
-	updatedAt: string;
-};
-
-export type CreateTemplateRequest = {
-	name: string;
-	subject: string;
-	html?: string;
-	text?: string;
-};
-
-export type UpdateTemplateRequest = {
-	name?: string;
-	subject?: string;
-	html?: string | null;
-	text?: string | null;
 };
 
 export type SendPigeonOptions = {
@@ -146,6 +131,20 @@ export class SendPigeon {
 		delete: (id: string) => Promise<Result<void>>;
 	};
 
+	readonly domains: {
+		list: () => Promise<Result<DomainListItem[]>>;
+		create: (options: CreateDomainOptions) => Promise<Result<DomainWithDnsRecords>>;
+		get: (id: string) => Promise<Result<DomainWithDnsRecords>>;
+		verify: (id: string) => Promise<Result<DomainVerificationResult>>;
+		delete: (id: string) => Promise<Result<void>>;
+	};
+
+	readonly apiKeys: {
+		list: () => Promise<Result<ApiKey[]>>;
+		create: (options: CreateApiKeyOptions) => Promise<Result<ApiKeyWithSecret>>;
+		delete: (id: string) => Promise<Result<void>>;
+	};
+
 	constructor(apiKey: string, options?: SendPigeonOptions) {
 		this.apiKey = apiKey;
 		this.baseUrl = options?.baseUrl ?? DEFAULT_BASE_URL;
@@ -178,6 +177,50 @@ export class SendPigeon {
 				),
 			delete: (id) =>
 				request<void>(this.baseUrl, this.apiKey, "DELETE", `/v1/templates/${id}`),
+		};
+
+		this.domains = {
+			list: () =>
+				request<DomainListItem[]>(this.baseUrl, this.apiKey, "GET", "/v1/domains"),
+			create: (options) =>
+				request<DomainWithDnsRecords>(
+					this.baseUrl,
+					this.apiKey,
+					"POST",
+					"/v1/domains",
+					options,
+				),
+			get: (id) =>
+				request<DomainWithDnsRecords>(
+					this.baseUrl,
+					this.apiKey,
+					"GET",
+					`/v1/domains/${id}`,
+				),
+			verify: (id) =>
+				request<DomainVerificationResult>(
+					this.baseUrl,
+					this.apiKey,
+					"POST",
+					`/v1/domains/${id}/verify`,
+				),
+			delete: (id) =>
+				request<void>(this.baseUrl, this.apiKey, "DELETE", `/v1/domains/${id}`),
+		};
+
+		this.apiKeys = {
+			list: () =>
+				request<ApiKey[]>(this.baseUrl, this.apiKey, "GET", "/v1/api-keys"),
+			create: (options) =>
+				request<ApiKeyWithSecret>(
+					this.baseUrl,
+					this.apiKey,
+					"POST",
+					"/v1/api-keys",
+					options,
+				),
+			delete: (id) =>
+				request<void>(this.baseUrl, this.apiKey, "DELETE", `/v1/api-keys/${id}`),
 		};
 	}
 

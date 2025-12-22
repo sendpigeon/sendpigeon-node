@@ -1,6 +1,6 @@
 {
 	"name": "sendpigeon",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "Official Node.js SDK for SendPigeon email API",
 	"type": "module",
 	"main": "./dist/index.js",
@@ -19,6 +19,8 @@
 		"test": "vitest",
 		"test:run": "vitest run",
 		"lint": "tsc --noEmit",
+		"generate": "tsx scripts/generate.ts",
+		"generate:local": "tsx scripts/generate.ts local",
 		"prepublishOnly": "npm run build"
 	},
 	"repository": {
@@ -39,6 +41,8 @@
 		"node": ">=18"
 	},
 	"devDependencies": {
+		"openapi-typescript": "^7.10.1",
+		"tsx": "^4.21.0",
 		"typescript": "^5.7.0",
 		"vitest": "^2.1.0"
 	}
