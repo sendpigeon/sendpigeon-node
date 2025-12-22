@@ -58,6 +58,8 @@ export type BatchEmail = {
 	variables?: Record<string, string>;
 	attachments?: AttachmentInput[];
 	idempotencyKey?: string;
+	/** ISO 8601 datetime to schedule send. Max 30 days ahead. */
+	scheduled_at?: string;
 };
 
 export type BatchEmailResult =
@@ -170,6 +172,11 @@ export class SendPigeon {
 		delete: (id: string) => Promise<Result<void>>;
 	};
 
+	readonly emails: {
+		/** Cancel a scheduled email before it is sent */
+		cancel: (id: string) => Promise<Result<void>>;
+	};
+
 	constructor(apiKey: string, options?: SendPigeonOptions) {
 		this.apiKey = apiKey;
 		this.baseUrl = options?.baseUrl ?? DEFAULT_BASE_URL;
@@ -246,6 +253,16 @@ export class SendPigeon {
 				),
 			delete: (id) =>
 				request<void>(this.baseUrl, this.apiKey, "DELETE", `/v1/api-keys/${id}`),
+		};
+
+		this.emails = {
+			cancel: (id) =>
+				request<void>(
+					this.baseUrl,
+					this.apiKey,
+					"DELETE",
+					`/v1/emails/${id}/schedule`,
+				),
 		};
 	}
 
