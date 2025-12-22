@@ -44,6 +44,31 @@ export type CreateApiKeyOptions = {
 	domainId?: string;
 };
 
+// Batch email types
+export type BatchEmail = {
+	from: string;
+	to: string | string[];
+	cc?: string | string[];
+	bcc?: string | string[];
+	subject?: string;
+	html?: string;
+	text?: string;
+	replyTo?: string;
+	templateId?: string;
+	variables?: Record<string, string>;
+	attachments?: AttachmentInput[];
+	idempotencyKey?: string;
+};
+
+export type BatchEmailResult =
+	| { index: number; status: "sent"; id: string; suppressed?: string[] }
+	| { index: number; status: "error"; error: { code: string; message: string } };
+
+export type SendBatchResponse = {
+	data: BatchEmailResult[];
+	summary: { total: number; sent: number; failed: number };
+};
+
 // SDK-specific types
 export type SendEmailOptions = {
 	idempotencyKey?: string;
@@ -239,6 +264,20 @@ export class SendPigeon {
 					"idempotency-key": options.idempotencyKey,
 				}),
 			},
+		);
+	}
+
+	/**
+	 * Send up to 100 emails in a single request.
+	 * Returns per-email status - some may succeed while others fail.
+	 */
+	sendBatch(emails: BatchEmail[]): Promise<Result<SendBatchResponse>> {
+		return request<SendBatchResponse>(
+			this.baseUrl,
+			this.apiKey,
+			"POST",
+			"/v1/emails/batch",
+			{ emails },
 		);
 	}
 }

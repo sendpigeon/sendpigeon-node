@@ -79,6 +79,77 @@ const { data, error } = await pigeon.send({
 
 Limits: 7MB per file, 25MB total. HTTPS only for URLs. Executables (.exe, .bat, etc.) are blocked.
 
+## Batch sending
+
+Send up to 100 emails in a single request. Each email is processed independently - some may succeed while others fail.
+
+```typescript
+const { data, error } = await pigeon.sendBatch([
+  {
+    from: "hello@yourdomain.com",
+    to: "user1@example.com",
+    subject: "Hello User 1",
+    html: "<p>Welcome!</p>",
+  },
+  {
+    from: "hello@yourdomain.com",
+    to: "user2@example.com",
+    subject: "Hello User 2",
+    html: "<p>Welcome!</p>",
+  },
+]);
+
+if (error) {
+  // Network or auth error - no emails sent
+  console.log(error.message);
+  return;
+}
+
+// Check results per email
+console.log(data.summary); // { total: 2, sent: 2, failed: 0 }
+
+for (const result of data.data) {
+  if (result.status === "sent") {
+    console.log(`Email ${result.index} sent: ${result.id}`);
+  } else {
+    console.log(`Email ${result.index} failed: ${result.error.code}`);
+  }
+}
+```
+
+### With templates
+
+```typescript
+const { data } = await pigeon.sendBatch([
+  {
+    from: "hello@yourdomain.com",
+    to: "user1@example.com",
+    templateId: "welcome",
+    variables: { name: "Alice" },
+  },
+  {
+    from: "hello@yourdomain.com",
+    to: "user2@example.com",
+    templateId: "welcome",
+    variables: { name: "Bob" },
+  },
+]);
+```
+
+### With per-email idempotency
+
+```typescript
+const { data } = await pigeon.sendBatch([
+  {
+    from: "hello@yourdomain.com",
+    to: "user@example.com",
+    subject: "Order confirmed",
+    html: "<p>Your order is confirmed.</p>",
+    idempotencyKey: "order-123-confirmation",
+  },
+]);
+```
+
 ## Templates
 
 Manage email templates programmatically:
