@@ -45,31 +45,9 @@ export type CreateApiKeyOptions = {
 };
 
 // Batch email types
-export type BatchEmail = {
-	from: string;
-	to: string | string[];
-	cc?: string | string[];
-	bcc?: string | string[];
-	subject?: string;
-	html?: string;
-	text?: string;
-	replyTo?: string;
-	templateId?: string;
-	variables?: Record<string, string>;
-	attachments?: AttachmentInput[];
-	idempotencyKey?: string;
-	/** ISO 8601 datetime to schedule send. Max 30 days ahead. */
-	scheduled_at?: string;
-};
-
-export type BatchEmailResult =
-	| { index: number; status: "sent"; id: string; suppressed?: string[] }
-	| { index: number; status: "error"; error: { code: string; message: string } };
-
-export type SendBatchResponse = {
-	data: BatchEmailResult[];
-	summary: { total: number; sent: number; failed: number };
-};
+export type BatchEmail = components["schemas"]["BatchEmailEntry"];
+export type BatchEmailResult = components["schemas"]["BatchEmailResult"];
+export type SendBatchResponse = components["schemas"]["SendBatchEmailResponse"];
 
 // SDK-specific types
 export type SendEmailOptions = {

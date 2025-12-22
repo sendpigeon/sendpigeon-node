@@ -1344,6 +1344,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/emails/{id}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Cancel scheduled email
+         * @description Cancel a scheduled email before it is sent.
+         */
+        delete: operations["cancelScheduledEmail"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/webhooks/sns": {
         parameters: {
             query?: never;
@@ -1995,7 +2015,13 @@ export interface components {
              * @example sent
              * @enum {string}
              */
-            status: "pending" | "sent" | "delivered" | "bounced" | "complained" | "failed";
+            status: "scheduled" | "cancelled" | "pending" | "sent" | "delivered" | "bounced" | "complained" | "failed";
+            /**
+             * Format: date-time
+             * @description Scheduled send time (only if scheduled)
+             * @example 2024-01-15T10:00:00Z
+             */
+            scheduled_at?: string;
             /** @description List of suppressed recipient addresses (bounced/complained previously) */
             suppressed?: string[];
         };
@@ -2056,6 +2082,12 @@ export interface components {
             };
             /** @description File attachments. Provide content (base64) or path (URL). */
             attachments?: components["schemas"]["AttachmentInput"][];
+            /**
+             * Format: date-time
+             * @description ISO 8601 datetime to send email. Max 30 days ahead. Omit to send immediately.
+             * @example 2024-01-15T10:00:00Z
+             */
+            scheduled_at?: string;
         };
         BatchEmailResult: {
             /** @description Index in request array */
@@ -2113,6 +2145,12 @@ export interface components {
             attachments?: components["schemas"]["AttachmentInput"][];
             /** @description Unique key to prevent duplicate sends for this email. */
             idempotencyKey?: string;
+            /**
+             * Format: date-time
+             * @description ISO 8601 datetime to send. Max 30 days ahead.
+             * @example 2024-01-15T10:00:00Z
+             */
+            scheduled_at?: string;
         };
         SendBatchEmailRequest: {
             /** @description Array of emails to send (1-100) */
@@ -2442,6 +2480,53 @@ export interface operations {
             };
             /** @description Internal server error */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    cancelScheduledEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Email schedule cancelled */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Email not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Email is not scheduled */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

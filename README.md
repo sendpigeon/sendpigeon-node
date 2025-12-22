@@ -150,6 +150,42 @@ const { data } = await pigeon.sendBatch([
 ]);
 ```
 
+## Scheduling
+
+Schedule emails to send later (up to 30 days ahead):
+
+```typescript
+const { data, error } = await pigeon.send({
+  from: "hello@yourdomain.com",
+  to: "user@example.com",
+  subject: "Happy New Year!",
+  html: "<p>Best wishes for 2025!</p>",
+  scheduled_at: "2025-01-01T00:00:00Z",
+});
+
+console.log(data.id); // Use this ID to cancel if needed
+```
+
+### Cancel scheduled email
+
+```typescript
+const { error } = await pigeon.emails.cancel("email_abc123");
+```
+
+### Batch scheduling
+
+```typescript
+const { data } = await pigeon.sendBatch([
+  {
+    from: "hello@yourdomain.com",
+    to: "user@example.com",
+    subject: "Scheduled message",
+    html: "<p>This will arrive later.</p>",
+    scheduled_at: "2025-01-15T09:00:00Z",
+  },
+]);
+```
+
 ## Templates
 
 Manage email templates programmatically:
