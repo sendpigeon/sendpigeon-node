@@ -32,6 +32,28 @@ if (error) {
 }
 ```
 
+## React Email
+
+Use [React Email](https://react.email) components directly:
+
+```tsx
+import { SendPigeon } from "sendpigeon";
+import { WelcomeEmail } from "./emails/welcome";
+
+const { data, error } = await pigeon.send({
+  from: "hello@yourdomain.com",
+  to: "user@example.com",
+  subject: "Welcome!",
+  react: <WelcomeEmail name="John" />,
+});
+```
+
+Requires `@react-email/render` as peer dependency:
+
+```bash
+npm install @react-email/render
+```
+
 ## Configuration
 
 ```typescript
