@@ -368,10 +368,10 @@ describe("templates", () => {
 		name: "Welcome Email",
 		subject: "Welcome {{name}}!",
 		html: "<p>Hello {{name}}</p>",
+		content: { type: "doc" },
 		text: null,
 		variables: [{ key: "name", type: "string" }],
 		status: "draft",
-		domain: null,
 		createdAt: "2024-01-15T10:30:00Z",
 		updatedAt: "2024-01-15T10:30:00Z",
 	};
