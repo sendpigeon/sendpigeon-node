@@ -80,6 +80,30 @@ SENDPIGEON_DEV=true npm run dev
 
 When `SENDPIGEON_DEV=true`, the SDK routes requests to `localhost:4100` instead of production.
 
+## Tracking
+
+Enable open/click tracking per email (opt-in):
+
+```typescript
+const { data } = await pigeon.send({
+  from: "hello@yourdomain.com",
+  to: "user@example.com",
+  subject: "Welcome!",
+  html: "<p>Check out our <a href='https://example.com'>site</a>!</p>",
+  tracking: {
+    opens: true,   // Track opens via invisible pixel
+    clicks: true,  // Track link clicks
+  },
+});
+
+// Response may include warnings if tracking is disabled at org level
+if (data.warnings) {
+  console.log("Warnings:", data.warnings);
+}
+```
+
+Configure organization defaults in Settings → Tracking.
+
 ## Available Methods
 
 ```typescript

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.0
+
+- Per-email tracking: `tracking: { opens, clicks }` option in send requests
+- Response `warnings` field for non-fatal issues (e.g., tracking disabled at org level)
+- Updated `TrackingDefaults` to use `trackingEnabled` master toggle
+
+## 1.8.0
+
+- Regenerated types from OpenAPI schema
+
 ## 1.7.0
 
 - Add Suppressions API (`suppressions.list`, `suppressions.delete`)

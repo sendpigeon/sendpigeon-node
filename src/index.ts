@@ -109,6 +109,15 @@ export class SendPigeon {
 			this.req<void>("DELETE", `/v1/suppressions/${encodeURIComponent(email)}`),
 	};
 
+	readonly tracking = {
+		/** Get organization tracking defaults */
+		getDefaults: () =>
+			this.req<types.TrackingDefaults>("GET", "/v1/tracking/defaults"),
+		/** Update organization tracking defaults */
+		updateDefaults: (data: types.UpdateTrackingDefaultsRequest) =>
+			this.req<types.TrackingDefaults>("PATCH", "/v1/tracking/defaults", data),
+	};
+
 	constructor(apiKey: string, options?: types.SendPigeonOptions) {
 		this.apiKey = apiKey;
 		const { url, isDevMode } = resolveBaseUrl(options?.baseUrl);

@@ -1,4 +1,636 @@
 export interface paths {
+    "/v1/admin/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get admin status */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Admin status */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            isAdmin: boolean;
+                            requiresVerification: boolean;
+                            email: string;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/request-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Request admin access verification code */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Code sent */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/verify-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify admin access code */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        code: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Code verified */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            valid: boolean;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not an admin or invalid code */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/organizations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all organizations */
+        get: {
+            parameters: {
+                query?: {
+                    search?: string;
+                    plan?: string;
+                    disabled?: "true" | "false";
+                    cursor?: string;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of organizations */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            organizations: {
+                                id: string;
+                                name: string;
+                                slug: string;
+                                createdAt: string;
+                                disabled: boolean;
+                                disabledAt: string | null;
+                                disabledReason: string | null;
+                                plan: string;
+                                memberCount: number;
+                                emailCount: number;
+                                domainCount: number;
+                                apiKeyCount: number;
+                                templateCount: number;
+                                lastApiKeyUsedAt: string | null;
+                            }[];
+                            nextCursor: string | null;
+                            total: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/organizations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get organization details */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Organization details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            id: string;
+                            name: string;
+                            slug: string;
+                            createdAt: string;
+                            disabled: boolean;
+                            disabledAt: string | null;
+                            disabledReason: string | null;
+                            plan: string;
+                            memberCount: number;
+                            emailCount: number;
+                            domainCount: number;
+                            apiKeyCount: number;
+                            templateCount: number;
+                            lastApiKeyUsedAt: string | null;
+                            members: {
+                                id: string;
+                                userId: string;
+                                email: string;
+                                name: string;
+                                role: string;
+                                createdAt: string;
+                            }[];
+                            domains: {
+                                id: string;
+                                name: string;
+                                status: string;
+                                createdAt: string;
+                            }[];
+                            apiKeys: {
+                                id: string;
+                                name: string;
+                                keyPrefix: string;
+                                mode: string;
+                                lastUsedAt: string | null;
+                                createdAt: string;
+                            }[];
+                            templates: {
+                                id: string;
+                                templateId: string;
+                                name: string | null;
+                                status: string;
+                                updatedAt: string;
+                            }[];
+                            usage: {
+                                periodStart: string;
+                                periodEnd: string;
+                                emailCount: number;
+                                inboundEmailCount: number;
+                            };
+                            subscription: {
+                                plan: string;
+                                status: string | null;
+                                stripeCustomerId: string | null;
+                                currentPeriodStart: string | null;
+                                currentPeriodEnd: string | null;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update organization (disable/enable, change plan) */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        disabled?: boolean;
+                        disabledReason?: string;
+                        /** @enum {string} */
+                        plan?: "FREE" | "STARTER" | "GROWTH" | "PRO" | "STAFF";
+                    };
+                };
+            };
+            responses: {
+                /** @description Organization updated */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            id: string;
+                            name: string;
+                            slug: string;
+                            createdAt: string;
+                            disabled: boolean;
+                            disabledAt: string | null;
+                            disabledReason: string | null;
+                            plan: string;
+                            memberCount: number;
+                            emailCount: number;
+                            domainCount: number;
+                            apiKeyCount: number;
+                            templateCount: number;
+                            lastApiKeyUsedAt: string | null;
+                            members: {
+                                id: string;
+                                userId: string;
+                                email: string;
+                                name: string;
+                                role: string;
+                                createdAt: string;
+                            }[];
+                            domains: {
+                                id: string;
+                                name: string;
+                                status: string;
+                                createdAt: string;
+                            }[];
+                            apiKeys: {
+                                id: string;
+                                name: string;
+                                keyPrefix: string;
+                                mode: string;
+                                lastUsedAt: string | null;
+                                createdAt: string;
+                            }[];
+                            templates: {
+                                id: string;
+                                templateId: string;
+                                name: string | null;
+                                status: string;
+                                updatedAt: string;
+                            }[];
+                            usage: {
+                                periodStart: string;
+                                periodEnd: string;
+                                emailCount: number;
+                                inboundEmailCount: number;
+                            };
+                            subscription: {
+                                plan: string;
+                                status: string | null;
+                                stripeCustomerId: string | null;
+                                currentPeriodStart: string | null;
+                                currentPeriodEnd: string | null;
+                            };
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all users */
+        get: {
+            parameters: {
+                query?: {
+                    search?: string;
+                    cursor?: string;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of users */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            users: {
+                                id: string;
+                                email: string;
+                                name: string;
+                                emailVerified: boolean;
+                                createdAt: string;
+                                lastLoginAt: string | null;
+                                organizationCount: number;
+                            }[];
+                            nextCursor: string | null;
+                            total: number;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get user details */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description User details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            id: string;
+                            email: string;
+                            name: string;
+                            emailVerified: boolean;
+                            createdAt: string;
+                            lastLoginAt: string | null;
+                            organizationCount: number;
+                            memberships: {
+                                organizationId: string;
+                                organizationName: string;
+                                role: string;
+                                createdAt: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/alerts": {
         parameters: {
             query?: never;
@@ -374,6 +1006,133 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/analytics/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    range?: "7d" | "30d" | "90d";
+                    domainId?: string;
+                    emailId?: string;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Link performance analytics */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            links: {
+                                url: string;
+                                clicks: number;
+                                uniqueClicks: number;
+                            }[];
+                            totalClicks: number;
+                            totalUniqueClicks: number;
+                        };
+                    };
+                };
+                /** @description Analytics not available on current plan */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            code: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/analytics/engagement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    range?: "7d" | "30d" | "90d";
+                    domainId?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Engagement summary */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            delivered: number;
+                            opens: number;
+                            uniqueOpens: number;
+                            clicks: number;
+                            uniqueClicks: number;
+                            openRate: number;
+                            clickRate: number;
+                            clickToOpenRate: number;
+                            emailClients: {
+                                client: string;
+                                count: number;
+                            }[];
+                            devices: {
+                                device: string;
+                                count: number;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Analytics not available on current plan */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            code: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -438,7 +1197,7 @@ export interface paths {
                         "application/json": {
                             subscription: {
                                 /** @enum {string} */
-                                plan: "FREE" | "EARLY_BIRD" | "STARTER" | "PRO" | "STAFF";
+                                plan: "FREE" | "STARTER" | "GROWTH" | "PRO" | "STAFF";
                                 status: string | null;
                                 currentPeriodStart: string | null;
                                 currentPeriodEnd: string | null;
@@ -447,7 +1206,7 @@ export interface paths {
                                 periodStart: string;
                                 periodEnd: string;
                                 emailCount: number;
-                                emailLimit: number;
+                                emailLimit: number | null;
                                 percentUsed: number;
                                 domainCount: number;
                                 domainLimit: number | null;
@@ -457,6 +1216,7 @@ export interface paths {
                                 domainLimit: number | null;
                                 templateLimit: number | null;
                                 formLimit: number | null;
+                                teamMemberLimit: number | null;
                                 inboundEmailLimit: number | null;
                                 logRetentionDays: number;
                             };
@@ -512,7 +1272,7 @@ export interface paths {
                 content: {
                     "application/json": {
                         /** @enum {string} */
-                        plan: "STARTER" | "PRO";
+                        plan: "STARTER" | "GROWTH" | "PRO";
                         /** Format: uri */
                         successUrl: string;
                         /** Format: uri */
@@ -1573,13 +2333,13 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description Tracking configuration for domain */
+                /** @description Tracking domain configuration for domain */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["TrackingConfig"];
+                        "application/json": components["schemas"]["TrackingDomainConfig"];
                     };
                 };
                 /** @description Not found */
@@ -1598,41 +2358,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": components["schemas"]["UpdateTrackingConfigRequest"];
-                };
-            };
-            responses: {
-                /** @description Updated tracking configuration */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["TrackingConfig"];
-                    };
-                };
-                /** @description Not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Error"];
-                    };
-                };
-            };
-        };
+        patch?: never;
         trace?: never;
     };
     "/v1/domains/{id}/tracking/domain": {
@@ -1664,7 +2390,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["TrackingConfig"];
+                        "application/json": components["schemas"]["TrackingDomainConfig"];
                     };
                 };
                 /** @description Invalid tracking domain format */
@@ -2156,6 +2882,308 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/v1/templates/{templateId}/render": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Render a template
+         * @description Render template content to email-safe HTML using react-email. Used for preview and sending.
+         */
+        post: operations["renderTemplate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/templates/{templateId}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List template versions
+         * @description Get version history for a template (max 20 versions kept).
+         */
+        get: operations["listTemplateVersions"];
+        put?: never;
+        /**
+         * Create a version snapshot
+         * @description Creates a version snapshot of the current template state. Throttled to max one version per 30 minutes.
+         */
+        post: operations["createTemplateVersion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/templates/{templateId}/versions/{versionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get version details
+         * @description Get full content of a specific version.
+         */
+        get: operations["getTemplateVersion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/templates/{templateId}/versions/{versionId}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore a version
+         * @description Restore template to a previous version. Current state is saved as a new version first.
+         */
+        post: operations["restoreTemplateVersion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/modules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List modules */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of modules */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            id: string;
+                            name: string;
+                            content: unknown[];
+                            createdAt: string;
+                        }[];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Create a module */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        name: string;
+                        content: unknown[];
+                    };
+                };
+            };
+            responses: {
+                /** @description Module created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            id: string;
+                            name: string;
+                            content: unknown[];
+                            createdAt: string;
+                        };
+                    };
+                };
+                /** @description Limit exceeded */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            code: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/modules/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a module */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Module */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            id: string;
+                            name: string;
+                            content: unknown[];
+                            createdAt: string;
+                        };
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            code: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /** Delete a module */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Module deleted */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            code: string;
+                        };
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /** Update a module */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        name?: string;
+                        content?: unknown[];
+                    };
+                };
+            };
+            responses: {
+                /** @description Module updated */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            id: string;
+                            name: string;
+                            content: unknown[];
+                            createdAt: string;
+                        };
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            error: string;
+                            code: string;
+                        };
+                    };
+                };
+            };
+        };
         trace?: never;
     };
     "/v1/emails": {
@@ -2695,6 +3723,237 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/onboarding/banner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Whether to show the onboarding banner */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            showBanner: boolean;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/organization": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getOrganization"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateOrganization"];
+        trace?: never;
+    };
+    "/v1/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateProfile"];
+        trace?: never;
+    };
+    "/v1/profile/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listSessions"];
+        put?: never;
+        post?: never;
+        delete: operations["revokeAllOtherSessions"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/profile/sessions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["revokeSession"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/profile/delete-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["deleteAccountPreview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/profile/delete-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["deleteAccountRequest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/profile/confirm-delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["confirmDeleteAccount"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/support/contact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        category: "bug" | "feature" | "billing" | "general";
+                        message: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Message sent successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            success: boolean;
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Failed to send message */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/two-factor/disable": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["disableTwoFactor"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/form/{formId}": {
         parameters: {
             query?: never;
@@ -2989,7 +4248,24 @@ export interface paths {
             };
         };
         post?: never;
-        delete?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Webhook deleted */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -3275,6 +4551,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/tracking/defaults": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getTrackingDefaults"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateTrackingDefaults"];
+        trace?: never;
+    };
     "/o/{trackingId}": {
         parameters: {
             query?: never;
@@ -3413,10 +4705,367 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/dkim-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateDkimCheckSessionRequest"];
+                };
+            };
+            responses: {
+                /** @description Session created */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DkimCheckSessionResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            code: string;
+                        };
+                    };
+                };
+                /** @description Rate limited */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            code: string;
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/dkim-check/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Session found */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["DkimCheckSessionResponse"];
+                    };
+                };
+                /** @description Session not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            code: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/editor/test-send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["PublicTestSendRequest"];
+                };
+            };
+            responses: {
+                /** @description Email sent successfully */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PublicTestSendResponse"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            message: string;
+                            code: string;
+                        };
+                    };
+                };
+                /** @description Rate limited */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RateLimitError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/editor/ai/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get AI feature status
+         * @description Returns whether AI features are enabled and rate limits.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description AI feature status */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AiStatusResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/editor/ai/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate email with AI
+         * @description Generate a complete email template from a natural language prompt.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["GenerateEmailRequest"];
+                };
+            };
+            responses: {
+                /** @description Generated email */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GenerateEmailResponse"];
+                    };
+                };
+                /** @description Rate limit exceeded */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GenerateEmailError"];
+                    };
+                };
+                /** @description AI generation failed */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GenerateEmailError"];
+                    };
+                };
+                /** @description AI service unavailable */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["GenerateEmailError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/editor/ai/improve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Improve text with AI
+         * @description Improve selected text according to the specified instruction.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ImproveTextRequest"];
+                };
+            };
+            responses: {
+                /** @description Improved text */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ImproveTextResponse"];
+                    };
+                };
+                /** @description Rate limit exceeded */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ImproveTextError"];
+                    };
+                };
+                /** @description AI improvement failed */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ImproveTextError"];
+                    };
+                };
+                /** @description AI service unavailable */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ImproveTextError"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Error: {
+            /** @example Invalid request */
+            message: string;
+            /** @example VALIDATION_ERROR */
+            code?: string;
+        };
         Alert: {
             id: string;
             domainId: string | null;
@@ -3434,12 +5083,6 @@ export interface components {
         AlertListResponse: {
             alerts: components["schemas"]["Alert"][];
             unreadCount: number;
-        };
-        Error: {
-            /** @example Invalid request */
-            message: string;
-            /** @example VALIDATION_ERROR */
-            code?: string;
         };
         UnreadCountResponse: {
             count: number;
@@ -3625,25 +5268,26 @@ export interface components {
             status: "on_track" | "too_fast" | "warmed_up";
             message: string;
         };
-        TrackingConfig: {
-            openTrackingEnabled: boolean;
-            clickTrackingEnabled: boolean;
-            privacyMode: boolean;
+        TrackingDomainConfig: {
+            /**
+             * @description Custom tracking domain (CNAME)
+             * @example track.yourdomain.com
+             */
             trackingDomain: string | null;
+            /** @description Whether the tracking domain CNAME is verified */
             trackingDomainVerified: boolean;
         };
-        UpdateTrackingConfigRequest: {
-            openTrackingEnabled?: boolean;
-            clickTrackingEnabled?: boolean;
-            privacyMode?: boolean;
-        };
         SetTrackingDomainRequest: {
+            /**
+             * @description Custom tracking domain to set, or null to remove
+             * @example track.yourdomain.com
+             */
             trackingDomain: string | null;
         };
         VerifyTrackingDomainResponse: {
             verified: boolean;
             actualCname: string | null;
-            config: components["schemas"]["TrackingConfig"];
+            config: components["schemas"]["TrackingDomainConfig"];
         };
         TemplateContent: {
             /**
@@ -3760,6 +5404,44 @@ export interface components {
                 [key: string]: string;
             };
         };
+        RenderTemplateResponse: {
+            /** @example Welcome to Acme, John! */
+            subject: string;
+            /** @description Rendered HTML email */
+            html: string;
+            /** @description Plain text version */
+            text: string;
+        };
+        RenderTemplateRequest: {
+            /**
+             * @description Variable values to substitute
+             * @example {
+             *       "name": "John",
+             *       "company": "Acme"
+             *     }
+             */
+            variables?: {
+                [key: string]: string;
+            };
+        };
+        TemplateVersion: {
+            /** @example ver_abc123 */
+            id: string;
+            /** @example Welcome to {{company}}! */
+            subject: string;
+            /** @example 2024-01-15T10:30:00Z */
+            createdAt: string;
+        };
+        TemplateVersionDetail: {
+            /** @example ver_abc123 */
+            id: string;
+            /** @example Welcome to {{company}}! */
+            subject: string;
+            content: components["schemas"]["TemplateContent"];
+            html: string | null;
+            /** @example 2024-01-15T10:30:00Z */
+            createdAt: string;
+        };
         SendEmailResponse: {
             /**
              * @description Unique email ID
@@ -3780,6 +5462,13 @@ export interface components {
             scheduled_at?: string;
             /** @description List of suppressed recipient addresses (bounced/complained previously) */
             suppressed?: string[];
+            /**
+             * @description Non-fatal warnings about the request. Email was sent successfully but some options may have been ignored.
+             * @example [
+             *       "tracking_disabled: Tracking options ignored - disabled at organization level"
+             *     ]
+             */
+            warnings?: string[];
         };
         SendEmailRequest: {
             /**
@@ -3855,6 +5544,25 @@ export interface components {
              * @example 2024-01-15T10:00:00Z
              */
             scheduled_at?: string;
+            /**
+             * @description Opt-in to tracking for this email. Disabled by default. Requires tracking to be enabled at organization level.
+             * @example {
+             *       "opens": true,
+             *       "clicks": true
+             *     }
+             */
+            tracking?: {
+                /**
+                 * @description Enable open tracking for this email
+                 * @example true
+                 */
+                opens?: boolean;
+                /**
+                 * @description Enable click tracking for this email
+                 * @example true
+                 */
+                clicks?: boolean;
+            };
         };
         BatchEmailResult: {
             /** @description Index in request array */
@@ -3864,6 +5572,7 @@ export interface components {
             /** @example em_abc123 */
             id: string;
             suppressed?: string[];
+            warnings?: string[];
         } | {
             /** @description Index in request array */
             index: number;
@@ -3925,6 +5634,17 @@ export interface components {
              * @example 2024-01-15T10:00:00Z
              */
             scheduled_at?: string;
+            /**
+             * @description Opt-in to tracking for this email. Disabled by default.
+             * @example {
+             *       "opens": true,
+             *       "clicks": true
+             *     }
+             */
+            tracking?: {
+                opens?: boolean;
+                clicks?: boolean;
+            };
         };
         SendBatchEmailRequest: {
             /** @description Array of emails to send (1-100) */
@@ -4035,6 +5755,54 @@ export interface components {
             allowedOrigins?: string[];
             isActive?: boolean;
         };
+        OrganizationResponse: {
+            id: string;
+            name: string;
+            slug: string;
+        };
+        UpdateOrganizationRequest: {
+            name: string;
+        };
+        ProfileResponse: {
+            id: string;
+            name: string;
+            email: string;
+            twoFactorEnabled: boolean;
+        };
+        UpdateProfileRequest: {
+            name: string;
+        };
+        Session: {
+            id: string;
+            createdAt: string;
+            userAgent: string | null;
+            isCurrent: boolean;
+        };
+        SessionListResponse: {
+            sessions: components["schemas"]["Session"][];
+        };
+        DeleteAccountPreviewResponse: {
+            orgsToDelete: {
+                id: string;
+                name: string;
+                emailCount: number;
+                templateCount: number;
+                domainCount: number;
+            }[];
+            orgsToLeave: {
+                id: string;
+                name: string;
+            }[];
+            blockedByOrgs: {
+                id: string;
+                name: string;
+                memberCount: number;
+            }[];
+            canDelete: boolean;
+        };
+        DisableTwoFactorRequest: {
+            code: string;
+        };
         SubmitFormRequest: {
             /**
              * Format: email
@@ -4046,12 +5814,136 @@ export interface components {
             /** @description Spam protection - must be empty */
             _honeypot?: string;
         };
+        TrackingDefaults: {
+            /** @description Master toggle - if false, tracking is disabled org-wide */
+            trackingEnabled: boolean;
+            /** @description Anonymize IPs in tracking data */
+            privacyMode: boolean;
+            /** @description Fire webhook on every open vs first only */
+            webhookOnEveryOpen: boolean;
+            /** @description Fire webhook on every click vs first only */
+            webhookOnEveryClick: boolean;
+        };
+        UpdateTrackingDefaultsRequest: {
+            trackingEnabled?: boolean;
+            privacyMode?: boolean;
+            webhookOnEveryOpen?: boolean;
+            webhookOnEveryClick?: boolean;
+        };
         ContactRequest: {
             name: string;
             /** Format: email */
             email: string;
             message: string;
             _honeypot?: string;
+        };
+        DkimCheckSessionResponse: {
+            id: string;
+            domain: string;
+            verifyEmail: string;
+            /** @enum {string} */
+            status: "pending" | "completed" | "expired";
+            selector: string | null;
+            dkimDomain: string | null;
+            expiresAt: string;
+        };
+        CreateDkimCheckSessionRequest: {
+            domain: string;
+        };
+        PublicTestSendResponse: {
+            message: string;
+            remaining: number;
+            recipientRemaining: number;
+        };
+        RateLimitError: {
+            message: string;
+            /** @enum {string} */
+            code: "RATE_LIMITED";
+            retryAfter: number;
+        };
+        PublicTestSendRequest: {
+            /** Format: email */
+            to: string;
+            subject: string;
+            html: string;
+            text?: string;
+        };
+        AiStatusResponse: {
+            enabled: boolean;
+            limits: {
+                generate: number;
+                improve: number;
+            };
+        };
+        TipTapNode: {
+            type: string;
+            attrs?: {
+                [key: string]: unknown;
+            };
+            content?: {
+                [key: string]: unknown;
+            }[];
+            marks?: {
+                type: string;
+                attrs?: {
+                    [key: string]: unknown;
+                };
+            }[];
+            text?: string;
+        };
+        GenerateEmailResponse: {
+            content: {
+                /** @enum {string} */
+                type: "doc";
+                content: components["schemas"]["TipTapNode"][];
+            };
+            subject: string;
+            variables: string[];
+            usage: {
+                inputTokens: number;
+                outputTokens: number;
+                cost: number;
+            };
+            remaining: number;
+        };
+        GenerateEmailError: {
+            /** @enum {string} */
+            error: "RATE_LIMITED" | "AI_ERROR" | "AI_UNAVAILABLE" | "INVALID_RESPONSE";
+            remaining?: number;
+            resetAt?: string;
+            upsell?: {
+                message: string;
+                signupUrl: string;
+            };
+        };
+        GenerateEmailRequest: {
+            prompt: string;
+            /** @enum {string} */
+            tone?: "professional" | "friendly" | "casual" | "urgent";
+        };
+        ImproveTextResponse: {
+            text: string;
+            usage: {
+                inputTokens: number;
+                outputTokens: number;
+                cost: number;
+            };
+            remaining: number;
+        };
+        ImproveTextError: {
+            /** @enum {string} */
+            error: "RATE_LIMITED" | "AI_ERROR" | "AI_UNAVAILABLE";
+            remaining?: number;
+            resetAt?: string;
+            upsell?: {
+                message: string;
+                signupUrl: string;
+            };
+        };
+        ImproveTextRequest: {
+            text: string;
+            /** @enum {string} */
+            instruction: "shorter" | "longer" | "persuasive" | "formal" | "casual";
         };
     };
     responses: never;
@@ -4564,6 +6456,182 @@ export interface operations {
             };
         };
     };
+    renderTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                templateId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["RenderTemplateRequest"];
+            };
+        };
+        responses: {
+            /** @description Rendered template */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RenderTemplateResponse"];
+                };
+            };
+            /** @description Missing required variables or no content */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Template not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    listTemplateVersions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                templateId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of versions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateVersion"][];
+                };
+            };
+            /** @description Template not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    createTemplateVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                templateId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Version creation attempted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Whether a new version was created */
+                        created: boolean;
+                    };
+                };
+            };
+            /** @description Template not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getTemplateVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                templateId: string;
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Version details */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateVersionDetail"];
+                };
+            };
+            /** @description Template or version not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    restoreTemplateVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                templateId: string;
+                versionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Version restored */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example Version restored */
+                        message: string;
+                    };
+                };
+            };
+            /** @description Template or version not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     sendEmail: {
         parameters: {
             query?: never;
@@ -4800,6 +6868,409 @@ export interface operations {
             };
             /** @description Email is not scheduled */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current organization */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationResponse"];
+                };
+            };
+            /** @description Organization not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    updateOrganization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UpdateOrganizationRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated organization */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganizationResponse"];
+                };
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Organization not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileResponse"];
+                };
+            };
+        };
+    };
+    updateProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UpdateProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProfileResponse"];
+                };
+            };
+        };
+    };
+    listSessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of sessions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionListResponse"];
+                };
+            };
+        };
+    };
+    revokeAllOtherSessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Number of sessions revoked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        count: number;
+                    };
+                };
+            };
+        };
+    };
+    revokeSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Session revoked */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Cannot revoke current session */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Session not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    deleteAccountPreview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Preview of what will be deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteAccountPreviewResponse"];
+                };
+            };
+        };
+    };
+    deleteAccountRequest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Confirmation email sent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                };
+            };
+            /** @description Cannot delete - must transfer ownership first */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Too many requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    confirmDeleteAccount: {
+        parameters: {
+            query: {
+                token: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        message: string;
+                    };
+                };
+            };
+            /** @description Invalid or expired token */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    disableTwoFactor: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DisableTwoFactorRequest"];
+            };
+        };
+        responses: {
+            /** @description Two-factor authentication disabled */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        success: boolean;
+                    };
+                };
+            };
+            /** @description Invalid code or 2FA not enabled */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getTrackingDefaults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Organization tracking defaults */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackingDefaults"];
+                };
+            };
+            /** @description Tracking not available on current plan */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Organization not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    updateTrackingDefaults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UpdateTrackingDefaultsRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated tracking defaults */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackingDefaults"];
+                };
+            };
+            /** @description Tracking not available on current plan */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Organization not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

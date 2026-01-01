@@ -87,6 +87,10 @@ export type ListSuppressionsOptions = {
 	offset?: number;
 };
 
+export type TrackingDefaults = components["schemas"]["TrackingDefaults"];
+export type UpdateTrackingDefaultsRequest =
+	components["schemas"]["UpdateTrackingDefaultsRequest"];
+
 export type SendEmailOptions = {
 	idempotencyKey?: string;
 };
