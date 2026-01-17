@@ -118,6 +118,89 @@ export class SendPigeon {
 			this.req<types.TrackingDefaults>("PATCH", "/v1/tracking/defaults", data),
 	};
 
+	readonly contacts = {
+		/** List contacts */
+		list: (opts?: types.ListContactsOptions) =>
+			this.req<types.ContactListResponse>(
+				"GET",
+				`/v1/contacts${buildQueryString(opts ?? {})}`,
+			),
+		/** Get audience statistics */
+		stats: () => this.req<types.AudienceStats>("GET", "/v1/contacts/stats"),
+		/** List unique tags */
+		tags: () => this.req<{ data: string[] }>("GET", "/v1/contacts/tags"),
+		/** Create a contact */
+		create: (data: types.CreateContactRequest) =>
+			this.req<types.Contact>("POST", "/v1/contacts", data),
+		/** Batch create/update contacts */
+		batch: (contacts: types.BatchContactRequest[]) =>
+			this.req<types.BatchResult>("POST", "/v1/contacts/batch", { contacts }),
+		/** Get a contact by ID */
+		get: (id: string) => this.req<types.Contact>("GET", `/v1/contacts/${id}`),
+		/** Update a contact */
+		update: (id: string, data: types.UpdateContactRequest) =>
+			this.req<types.Contact>("PATCH", `/v1/contacts/${id}`, data),
+		/** Delete a contact */
+		delete: (id: string) => this.req<void>("DELETE", `/v1/contacts/${id}`),
+		/** Unsubscribe a contact */
+		unsubscribe: (id: string) =>
+			this.req<types.Contact>("POST", `/v1/contacts/${id}/unsubscribe`),
+		/** Resubscribe a contact */
+		resubscribe: (id: string) =>
+			this.req<types.Contact>("POST", `/v1/contacts/${id}/resubscribe`),
+	};
+
+	readonly broadcasts = {
+		/** List broadcasts */
+		list: (opts?: types.ListBroadcastsOptions) =>
+			this.req<types.BroadcastListResponse>(
+				"GET",
+				`/v1/broadcasts${buildQueryString(opts ?? {})}`,
+			),
+		/** Create a broadcast */
+		create: (data: types.CreateBroadcastRequest) =>
+			this.req<types.Broadcast>("POST", "/v1/broadcasts", data),
+		/** Get a broadcast by ID */
+		get: (id: string) =>
+			this.req<types.Broadcast>("GET", `/v1/broadcasts/${id}`),
+		/** Update a broadcast (draft only) */
+		update: (id: string, data: types.UpdateBroadcastRequest) =>
+			this.req<types.Broadcast>("PATCH", `/v1/broadcasts/${id}`, data),
+		/** Delete a broadcast (draft only) */
+		delete: (id: string) => this.req<void>("DELETE", `/v1/broadcasts/${id}`),
+		/** Duplicate a broadcast */
+		duplicate: (id: string) =>
+			this.req<types.Broadcast>("POST", `/v1/broadcasts/${id}/duplicate`),
+		/** List recipients of a broadcast */
+		recipients: (id: string, opts?: types.ListRecipientsOptions) =>
+			this.req<types.RecipientListResponse>(
+				"GET",
+				`/v1/broadcasts/${id}/recipients${buildQueryString(opts ?? {})}`,
+			),
+		/** Send a broadcast immediately */
+		send: (id: string) =>
+			this.req<types.Broadcast>("POST", `/v1/broadcasts/${id}/send`),
+		/** Schedule a broadcast */
+		schedule: (id: string, data: types.ScheduleBroadcastRequest) =>
+			this.req<types.Broadcast>("POST", `/v1/broadcasts/${id}/schedule`, data),
+		/** Cancel a scheduled broadcast */
+		cancel: (id: string) =>
+			this.req<types.Broadcast>("POST", `/v1/broadcasts/${id}/cancel`),
+		/** Send a test email */
+		test: (id: string, data: types.TestBroadcastRequest) =>
+			this.req<types.TestBroadcastResponse>(
+				"POST",
+				`/v1/broadcasts/${id}/test`,
+				data,
+			),
+		/** Get broadcast analytics */
+		analytics: (id: string) =>
+			this.req<types.BroadcastAnalytics>(
+				"GET",
+				`/v1/broadcasts/${id}/analytics`,
+			),
+	};
+
 	constructor(apiKey: string, options?: types.SendPigeonOptions) {
 		this.apiKey = apiKey;
 		const { url, isDevMode } = resolveBaseUrl(options?.baseUrl);

@@ -95,6 +95,53 @@ export type SendEmailOptions = {
 	idempotencyKey?: string;
 };
 
+// Contacts
+export type Contact = components["schemas"]["Contact"];
+export type ContactStatus = Contact["status"];
+export type ContactListResponse = components["schemas"]["ContactListResponse"];
+export type CreateContactRequest = components["schemas"]["CreateContactRequest"];
+export type UpdateContactRequest = components["schemas"]["UpdateContactRequest"];
+export type BatchContactRequest = components["schemas"]["BatchContact"];
+export type BatchResult = components["schemas"]["BatchResult"];
+export type AudienceStats = components["schemas"]["AudienceStats"];
+
+export type ListContactsOptions = {
+	status?: ContactStatus;
+	tag?: string;
+	search?: string;
+	limit?: number;
+	offset?: number;
+};
+
+// Broadcasts
+export type Broadcast = components["schemas"]["Broadcast"];
+export type BroadcastStatus = Broadcast["status"];
+export type BroadcastStats = components["schemas"]["BroadcastStats"];
+export type BroadcastListResponse = components["schemas"]["BroadcastListResponse"];
+export type CreateBroadcastRequest = components["schemas"]["CreateBroadcastRequest"];
+export type UpdateBroadcastRequest = components["schemas"]["UpdateBroadcastRequest"];
+export type BroadcastRecipient = components["schemas"]["BroadcastRecipient"];
+export type RecipientStatus = BroadcastRecipient["status"];
+export type RecipientListResponse = components["schemas"]["RecipientListResponse"];
+export type ScheduleBroadcastRequest = components["schemas"]["ScheduleBroadcastRequest"];
+export type TestBroadcastRequest = components["schemas"]["TestBroadcastRequest"];
+export type TestBroadcastResponse = components["schemas"]["TestBroadcastResponse"];
+export type OpensOverTime = components["schemas"]["OpensOverTime"];
+export type LinkPerformance = components["schemas"]["LinkPerformance"];
+export type BroadcastAnalytics = components["schemas"]["BroadcastAnalytics"];
+
+export type ListBroadcastsOptions = {
+	status?: BroadcastStatus;
+	limit?: number;
+	offset?: number;
+};
+
+export type ListRecipientsOptions = {
+	status?: RecipientStatus;
+	limit?: number;
+	offset?: number;
+};
+
 export type SendPigeonOptions = {
 	baseUrl?: string;
 	/** Default: 30000 */

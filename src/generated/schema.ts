@@ -323,7 +323,7 @@ export interface paths {
                             subscription: {
                                 plan: string;
                                 status: string | null;
-                                stripeCustomerId: string | null;
+                                lemonSqueezyCustomerId: string | null;
                                 currentPeriodStart: string | null;
                                 currentPeriodEnd: string | null;
                             };
@@ -444,7 +444,7 @@ export interface paths {
                             subscription: {
                                 plan: string;
                                 status: string | null;
-                                stripeCustomerId: string | null;
+                                lemonSqueezyCustomerId: string | null;
                                 currentPeriodStart: string | null;
                                 currentPeriodEnd: string | null;
                             };
@@ -614,6 +614,90 @@ export interface paths {
                 };
                 /** @description Not found */
                 404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/admin/ai-costs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get AI costs summary and trends */
+        get: {
+            parameters: {
+                query?: {
+                    days?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description AI costs data */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            summary: {
+                                totalCost: number;
+                                totalRequests: number;
+                                totalInputTokens: number;
+                                totalOutputTokens: number;
+                                totalCacheReadTokens: number;
+                                totalCacheWriteTokens: number;
+                                uniqueUsers: number;
+                                generateCount: number;
+                                improveCount: number;
+                            };
+                            dailyCosts: {
+                                date: string;
+                                cost: number;
+                                requests: number;
+                            }[];
+                            recentUsage: {
+                                id: string;
+                                ipHash: string;
+                                type: string;
+                                prompt: string;
+                                inputTokens: number;
+                                outputTokens: number;
+                                cost: number;
+                                model: string;
+                                createdAt: string;
+                            }[];
+                        };
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -1210,6 +1294,8 @@ export interface paths {
                                 percentUsed: number;
                                 domainCount: number;
                                 domainLimit: number | null;
+                                contactCount: number;
+                                contactLimit: number | null;
                             };
                             limits: {
                                 emailLimit: number | null;
@@ -1217,6 +1303,7 @@ export interface paths {
                                 templateLimit: number | null;
                                 formLimit: number | null;
                                 teamMemberLimit: number | null;
+                                contactLimit: number | null;
                                 inboundEmailLimit: number | null;
                                 logRetentionDays: number;
                             };
@@ -1227,6 +1314,7 @@ export interface paths {
                                 webhooksEnabled: boolean;
                                 alertsEnabled: boolean;
                                 richTrackingAnalytics: boolean;
+                                broadcastsEnabled: boolean;
                             };
                             canUpgrade: boolean;
                             canManageSubscription: boolean;
@@ -1275,8 +1363,6 @@ export interface paths {
                         plan: "STARTER" | "GROWTH" | "PRO";
                         /** Format: uri */
                         successUrl: string;
-                        /** Format: uri */
-                        cancelUrl: string;
                     };
                 };
             };
@@ -1327,10 +1413,7 @@ export interface paths {
             };
             requestBody?: {
                 content: {
-                    "application/json": {
-                        /** Format: uri */
-                        returnUrl: string;
-                    };
+                    "application/json": Record<string, never>;
                 };
             };
             responses: {
@@ -2147,7 +2230,41 @@ export interface paths {
         };
         options?: never;
         head?: never;
-        patch?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateDomainRequest"];
+                };
+            };
+            responses: {
+                /** @description Updated domain */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Domain"];
+                    };
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
         trace?: never;
     };
     "/v1/domains/{id}/verify": {
@@ -4138,7 +4255,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/webhooks/incoming/stripe": {
+    "/webhooks/incoming/lemonsqueezy": {
         parameters: {
             query?: never;
             header?: never;
@@ -4536,6 +4653,1335 @@ export interface paths {
                 };
                 /** @description Missing headers or webhook not configured */
                 400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/contacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List contacts */
+        get: {
+            parameters: {
+                query?: {
+                    status?: "ACTIVE" | "UNSUBSCRIBED" | "BOUNCED" | "COMPLAINED";
+                    tag?: string;
+                    search?: string;
+                    limit?: number;
+                    offset?: number | null;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of contacts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ContactListResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Create a contact */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateContactRequest"];
+                };
+            };
+            responses: {
+                /** @description Created contact */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Contact"];
+                    };
+                };
+                /** @description Invalid email format */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Contact already exists */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/contacts/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get audience statistics */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Audience statistics */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AudienceStats"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/contacts/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List unique tags
+         * @description Returns all unique tags used across contacts in your audience
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of unique tags */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TagsResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/contacts/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create or update contacts in batch */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["BatchCreateContactsRequest"];
+                };
+            };
+            responses: {
+                /** @description Batch result */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BatchResult"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/contacts/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import contacts from CSV
+         * @description Upload a CSV file to import contacts. Max 1000 rows, 5MB file size. First row must be headers. Required column: email. Optional columns: firstName, lastName, company, tags (comma-separated), timezone.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file?: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Import result */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ImportResult"];
+                    };
+                };
+                /** @description Invalid CSV or file too large */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/contacts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a contact */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Contact details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Contact"];
+                    };
+                };
+                /** @description Contact not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /** Delete a contact */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Contact deleted */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Contact not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /** Update a contact */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateContactRequest"];
+                };
+            };
+            responses: {
+                /** @description Updated contact */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Contact"];
+                    };
+                };
+                /** @description Contact not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v1/contacts/{id}/unsubscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Unsubscribe a contact */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Unsubscribed contact */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Contact"];
+                    };
+                };
+                /** @description Contact is already unsubscribed */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Contact not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/contacts/{id}/resubscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resubscribe a contact */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Resubscribed contact */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Contact"];
+                    };
+                };
+                /** @description Contact is already active or cannot be resubscribed */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Contact not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/broadcasts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List broadcasts */
+        get: {
+            parameters: {
+                query?: {
+                    status?: "DRAFT" | "SCHEDULED" | "SENDING" | "SENT" | "CANCELLED" | "FAILED";
+                    limit?: number;
+                    offset?: number | null;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of broadcasts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BroadcastListResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Create a broadcast */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateBroadcastRequest"];
+                };
+            };
+            responses: {
+                /** @description Created broadcast */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Broadcast"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Domain not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/broadcasts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a broadcast */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Broadcast details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Broadcast"];
+                    };
+                };
+                /** @description Broadcast not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /**
+         * Delete a broadcast
+         * @description Only draft broadcasts can be deleted
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Broadcast deleted */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Broadcast not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /**
+         * Update a broadcast
+         * @description Only draft broadcasts can be edited
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateBroadcastRequest"];
+                };
+            };
+            responses: {
+                /** @description Updated broadcast */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Broadcast"];
+                    };
+                };
+                /** @description Broadcast is not editable */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Broadcast not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v1/broadcasts/{id}/duplicate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Duplicate a broadcast */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Duplicated broadcast */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Broadcast"];
+                    };
+                };
+                /** @description Broadcast not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/broadcasts/{id}/recipients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List broadcast recipients */
+        get: {
+            parameters: {
+                query?: {
+                    status?: "pending" | "sent" | "delivered" | "bounced" | "complained" | "failed";
+                    limit?: number;
+                    offset?: number | null;
+                };
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of recipients */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RecipientListResponse"];
+                    };
+                };
+                /** @description Broadcast not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/broadcasts/{id}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a broadcast immediately */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Broadcast queued for sending */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Broadcast"];
+                    };
+                };
+                /** @description Broadcast cannot be sent */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Broadcast not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/broadcasts/{id}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Schedule a broadcast */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ScheduleBroadcastRequest"];
+                };
+            };
+            responses: {
+                /** @description Broadcast scheduled */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Broadcast"];
+                    };
+                };
+                /** @description Broadcast cannot be scheduled */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Broadcast not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/broadcasts/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a scheduled broadcast */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Broadcast cancelled */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Broadcast"];
+                    };
+                };
+                /** @description Broadcast cannot be cancelled */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Broadcast not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/broadcasts/{id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a test email
+         * @description Send a test email to a single address. Does not count against quota.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["TestBroadcastRequest"];
+                };
+            };
+            responses: {
+                /** @description Test email sent */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["TestBroadcastResponse"];
+                    };
+                };
+                /** @description Cannot send test */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Broadcast not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/broadcasts/{id}/analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get broadcast analytics
+         * @description Get opens over time and link click performance for a broadcast
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Analytics data */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BroadcastAnalytics"];
+                    };
+                };
+                /** @description Broadcast not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/broadcast-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List broadcast templates */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description List of broadcast templates */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BroadcastTemplateListResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Create a broadcast template */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["CreateBroadcastTemplateRequest"];
+                };
+            };
+            responses: {
+                /** @description Created broadcast template */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BroadcastTemplate"];
+                    };
+                };
+                /** @description Invalid request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description Template with this ID already exists */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/broadcast-templates/{templateId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a broadcast template */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    templateId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Broadcast template details */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BroadcastTemplate"];
+                    };
+                };
+                /** @description Broadcast template not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        /** Delete a broadcast template */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    templateId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Broadcast template deleted */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Broadcast template not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        /** Update a broadcast template */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    templateId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["UpdateBroadcastTemplateRequest"];
+                };
+            };
+            responses: {
+                /** @description Updated broadcast template */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["BroadcastTemplate"];
+                    };
+                };
+                /** @description Broadcast template not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/v1/broadcast-templates/{templateId}/render": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Render a broadcast template
+         * @description Preview template with variables substituted
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    templateId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["RenderTemplateRequest"] & {
+                        /**
+                         * @description Variables to render in the template
+                         * @example {
+                         *       "company_name": "Acme Inc",
+                         *       "user_name": "Johan"
+                         *     }
+                         */
+                        variables: {
+                            [key: string]: string;
+                        };
+                    };
+                };
+            };
+            responses: {
+                /** @description Rendered template */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RenderTemplateResponse"] & {
+                            /** @example Welcome to Acme Inc! */
+                            subject: string;
+                            /** @example <html>...</html> */
+                            htmlContent: string;
+                            /** @example Plain text version... */
+                            textContent: string | null;
+                        };
+                    };
+                };
+                /** @description Broadcast template not found */
+                404: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -5206,6 +6652,8 @@ export interface components {
             name: string;
             /** @enum {string} */
             status: "pending" | "verified" | "temporary_failure" | "failed";
+            /** @enum {string} */
+            type: "TRANSACTIONAL" | "BROADCAST" | "BOTH";
             verifiedAt: string | null;
             lastCheckedAt: string | null;
             failingSince: string | null;
@@ -5246,6 +6694,10 @@ export interface components {
         DomainVerificationResult: {
             domain: components["schemas"]["Domain"];
             verification: components["schemas"]["VerificationStatus"];
+        };
+        UpdateDomainRequest: {
+            /** @enum {string} */
+            type: "TRANSACTIONAL" | "BROADCAST" | "BOTH";
         };
         DomainHealth: {
             score: number;
@@ -5813,6 +7265,486 @@ export interface components {
             name?: string;
             /** @description Spam protection - must be empty */
             _honeypot?: string;
+        };
+        Contact: {
+            /** @example con_abc123 */
+            id: string;
+            /**
+             * Format: email
+             * @example johan@example.com
+             */
+            email: string;
+            /**
+             * @description Freeform JSON fields for contact data
+             * @example {
+             *       "firstName": "Johan",
+             *       "lastName": "Stenius",
+             *       "company": "Acme Corp"
+             *     }
+             */
+            fields: {
+                [key: string]: unknown;
+            };
+            /**
+             * @example [
+             *       "newsletter",
+             *       "vip"
+             *     ]
+             */
+            tags: string[];
+            /** @example Europe/Stockholm */
+            timezone: string | null;
+            /**
+             * @example ACTIVE
+             * @enum {string}
+             */
+            status: "ACTIVE" | "UNSUBSCRIBED" | "BOUNCED" | "COMPLAINED";
+            /** @example null */
+            unsubscribedAt: string | null;
+            /** @example null */
+            bouncedAt: string | null;
+            /** @example null */
+            complainedAt: string | null;
+            /** @example 2024-01-15T10:30:00Z */
+            createdAt: string;
+            /** @example 2024-01-15T10:30:00Z */
+            updatedAt: string;
+        };
+        ContactListResponse: {
+            data: components["schemas"]["Contact"][];
+            /** @example 12500 */
+            total: number;
+        };
+        AudienceStats: {
+            /** @example 12500 */
+            total: number;
+            /** @example 11892 */
+            active: number;
+            /** @example 500 */
+            unsubscribed: number;
+            /** @example 80 */
+            bounced: number;
+            /** @example 28 */
+            complained: number;
+        };
+        TagsResponse: {
+            /**
+             * @example [
+             *       "newsletter",
+             *       "vip"
+             *     ]
+             */
+            data: string[];
+        };
+        CreateContactRequest: {
+            /**
+             * Format: email
+             * @example user@example.com
+             */
+            email: string;
+            /**
+             * @description Freeform JSON fields for contact data
+             * @example {
+             *       "firstName": "Johan",
+             *       "lastName": "Stenius",
+             *       "company": "Acme Corp"
+             *     }
+             */
+            fields?: {
+                [key: string]: unknown;
+            };
+            /**
+             * @example [
+             *       "newsletter"
+             *     ]
+             */
+            tags?: string[];
+            /** @example America/New_York */
+            timezone?: string;
+        };
+        BatchResult: {
+            /** @example 95 */
+            created: number;
+            /** @example 3 */
+            updated: number;
+            /**
+             * @example [
+             *       {
+             *         "email": "invalid",
+             *         "error": "Invalid email format"
+             *       }
+             *     ]
+             */
+            failed: {
+                email: string;
+                error: string;
+            }[];
+        };
+        BatchContact: {
+            /**
+             * Format: email
+             * @example user@example.com
+             */
+            email: string;
+            /**
+             * @description Freeform JSON fields for contact data
+             * @example {
+             *       "firstName": "Johan",
+             *       "lastName": "Stenius",
+             *       "company": "Acme Corp"
+             *     }
+             */
+            fields?: {
+                [key: string]: unknown;
+            };
+            tags?: string[];
+            timezone?: string;
+        };
+        BatchCreateContactsRequest: {
+            /** @description Up to 1000 contacts per batch */
+            contacts: components["schemas"]["BatchContact"][];
+        };
+        ImportResult: {
+            /** @example 890 */
+            created: number;
+            /** @example 105 */
+            updated: number;
+            /** @example 5 */
+            skipped: number;
+            /**
+             * @example [
+             *       {
+             *         "row": 3,
+             *         "email": "invalid",
+             *         "error": "Invalid email format"
+             *       }
+             *     ]
+             */
+            errors: {
+                row: number;
+                email?: string;
+                error: string;
+            }[];
+        };
+        UpdateContactRequest: {
+            /**
+             * @description Freeform JSON fields for contact data
+             * @example {
+             *       "firstName": "Johan",
+             *       "lastName": "Stenius",
+             *       "company": "Acme Corp"
+             *     }
+             */
+            fields?: {
+                [key: string]: unknown;
+            };
+            tags?: string[];
+            timezone?: string | null;
+        };
+        BroadcastStats: {
+            /** @example 5000 */
+            totalRecipients: number;
+            /** @example 4950 */
+            sentCount: number;
+            /** @example 4900 */
+            deliveredCount: number;
+            /** @example 2450 */
+            openedCount: number;
+            /** @example 980 */
+            clickedCount: number;
+            /** @example 30 */
+            bouncedCount: number;
+            /** @example 5 */
+            complainedCount: number;
+            /** @example 15 */
+            unsubscribedCount: number;
+        };
+        Broadcast: {
+            /** @example bc_abc123 */
+            id: string;
+            /** @example December Newsletter */
+            name: string;
+            /** @example Your December Updates */
+            subject: string;
+            /** @example Check out what's new this month */
+            previewText: string | null;
+            /** @example <html>...</html> */
+            htmlContent: string | null;
+            /**
+             * @example {
+             *       "type": "doc",
+             *       "content": []
+             *     }
+             */
+            content: {
+                [key: string]: unknown;
+            } | null;
+            /** @example Plain text version... */
+            textContent: string | null;
+            /** @example Acme Inc */
+            fromName: string;
+            /**
+             * Format: email
+             * @example news@acme.com
+             */
+            fromEmail: string;
+            /** @example support@acme.com */
+            replyTo: string | null;
+            /** @example 123 Main St, City, Country */
+            physicalAddress: string | null;
+            /**
+             * @example [
+             *       "newsletter",
+             *       "monthly"
+             *     ]
+             */
+            tags: string[];
+            /**
+             * @example DRAFT
+             * @enum {string}
+             */
+            status: "DRAFT" | "SCHEDULED" | "SENDING" | "SENT" | "CANCELLED" | "FAILED";
+            /** @example 2024-12-20T10:00:00Z */
+            scheduledAt: string | null;
+            /** @example null */
+            sentAt: string | null;
+            /** @example null */
+            completedAt: string | null;
+            stats: components["schemas"]["BroadcastStats"];
+            /** @example 2024-12-15T10:30:00Z */
+            createdAt: string;
+            /** @example 2024-12-15T10:30:00Z */
+            updatedAt: string;
+        };
+        BroadcastListResponse: {
+            data: components["schemas"]["Broadcast"][];
+            /** @example 25 */
+            total: number;
+        };
+        CreateBroadcastRequest: {
+            /** @example December Newsletter */
+            name: string;
+            /** @example Your December Updates */
+            subject: string;
+            /** @example Check out what's new */
+            previewText?: string;
+            /** @example <html>...</html> */
+            htmlContent?: string;
+            /**
+             * @description Editor JSON content
+             * @example {
+             *       "type": "doc",
+             *       "content": []
+             *     }
+             */
+            content?: {
+                [key: string]: unknown;
+            };
+            /** @example Plain text version... */
+            textContent?: string;
+            /** @example Acme Inc */
+            fromName: string;
+            /**
+             * Format: email
+             * @example news@acme.com
+             */
+            fromEmail: string;
+            /**
+             * Format: email
+             * @example support@acme.com
+             */
+            replyTo?: string;
+            /** @example dom_xyz789 */
+            domainId: string;
+            /**
+             * @example [
+             *       "newsletter"
+             *     ]
+             */
+            tags?: string[];
+            /**
+             * @description Optional template ID to copy content from
+             * @example bt_abc123
+             */
+            broadcastTemplateId?: string;
+        };
+        UpdateBroadcastRequest: {
+            name?: string;
+            subject?: string;
+            previewText?: string | null;
+            htmlContent?: string | null;
+            content?: {
+                [key: string]: unknown;
+            } | null;
+            textContent?: string | null;
+            fromName?: string;
+            /** Format: email */
+            fromEmail?: string;
+            /** Format: email */
+            replyTo?: string | null;
+            tags?: string[];
+        };
+        BroadcastRecipient: {
+            /** @example rec_abc123 */
+            id: string;
+            /** @example con_xyz789 */
+            contactId: string;
+            /**
+             * Format: email
+             * @example user@example.com
+             */
+            email: string;
+            /**
+             * @example delivered
+             * @enum {string}
+             */
+            status: "pending" | "sent" | "delivered" | "bounced" | "complained" | "failed";
+            /** @example 2024-12-20T10:00:05Z */
+            sentAt: string | null;
+            /** @example 2024-12-20T10:00:08Z */
+            deliveredAt: string | null;
+            /** @example 2024-12-20T10:15:00Z */
+            openedAt: string | null;
+            /** @example null */
+            clickedAt: string | null;
+            /** @example null */
+            bouncedAt: string | null;
+            /** @example null */
+            complainedAt: string | null;
+            /** @example null */
+            unsubscribedAt: string | null;
+            /** @example 2024-12-20T10:00:00Z */
+            createdAt: string;
+        };
+        RecipientListResponse: {
+            data: components["schemas"]["BroadcastRecipient"][];
+            /** @example 5000 */
+            total: number;
+        };
+        ScheduleBroadcastRequest: {
+            /**
+             * Format: date-time
+             * @description ISO 8601 datetime
+             * @example 2024-12-20T10:00:00Z
+             */
+            scheduledAt: string;
+        };
+        TestBroadcastResponse: {
+            /** @example true */
+            success: boolean;
+            /** @example Test email sent */
+            message: string;
+        };
+        TestBroadcastRequest: {
+            /**
+             * Format: email
+             * @example test@example.com
+             */
+            email: string;
+        };
+        OpensOverTime: {
+            /** @example 2024-12-15T10:00:00Z */
+            hour: string;
+            /** @example 125 */
+            opens: number;
+        };
+        LinkPerformance: {
+            /** @example https://example.com/promo */
+            url: string;
+            /** @example 450 */
+            clicks: number;
+            /** @example 320 */
+            uniqueClicks: number;
+        };
+        BroadcastAnalytics: {
+            opensOverTime: components["schemas"]["OpensOverTime"][];
+            linkPerformance: components["schemas"]["LinkPerformance"][];
+        };
+        BroadcastTemplate: {
+            /** @example bct_abc123 */
+            id: string;
+            /** @example welcome-email */
+            templateId: string;
+            /** @example Welcome Email */
+            name: string;
+            /** @example Welcome to {{company_name}}! */
+            subject: string;
+            /** @example Thanks for signing up */
+            previewText: string | null;
+            /** @example <html>...</html> */
+            htmlContent: string;
+            /** @example <html>...</html> */
+            editorHtml: string | null;
+            /**
+             * @description Editor state JSON
+             * @example {
+             *       "blocks": []
+             *     }
+             */
+            content: {
+                [key: string]: unknown;
+            } | null;
+            /** @example Plain text version... */
+            textContent: string | null;
+            /**
+             * @example [
+             *       "company_name",
+             *       "user_name"
+             *     ]
+             */
+            variables: string[];
+            /** @example 2024-01-15T10:30:00Z */
+            createdAt: string;
+            /** @example 2024-01-15T10:30:00Z */
+            updatedAt: string;
+        };
+        BroadcastTemplateListResponse: {
+            data: components["schemas"]["BroadcastTemplate"][];
+            /** @example 10 */
+            total: number;
+        };
+        CreateBroadcastTemplateRequest: {
+            /** @example welcome-email */
+            templateId: string;
+            /** @example Welcome Email */
+            name: string;
+            /** @example Welcome to {{company_name}}! */
+            subject: string;
+            /** @example Thanks for signing up */
+            previewText?: string;
+            /** @example <html>...</html> */
+            htmlContent: string;
+            /** @example <html>...</html> */
+            editorHtml?: string;
+            /**
+             * @description Editor state JSON
+             * @example {
+             *       "blocks": []
+             *     }
+             */
+            content?: {
+                [key: string]: unknown;
+            };
+            /** @example Plain text version... */
+            textContent?: string;
+            /**
+             * @example [
+             *       "company_name"
+             *     ]
+             */
+            variables?: string[];
+        };
+        UpdateBroadcastTemplateRequest: {
+            name?: string;
+            subject?: string;
+            previewText?: string | null;
+            htmlContent?: string;
+            editorHtml?: string | null;
+            content?: {
+                [key: string]: unknown;
+            } | null;
+            textContent?: string | null;
+            variables?: string[];
         };
         TrackingDefaults: {
             /** @description Master toggle - if false, tracking is disabled org-wide */
