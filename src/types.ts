@@ -123,12 +123,28 @@ export type UpdateBroadcastRequest = components["schemas"]["UpdateBroadcastReque
 export type BroadcastRecipient = components["schemas"]["BroadcastRecipient"];
 export type RecipientStatus = BroadcastRecipient["status"];
 export type RecipientListResponse = components["schemas"]["RecipientListResponse"];
-export type ScheduleBroadcastRequest = components["schemas"]["ScheduleBroadcastRequest"];
 export type TestBroadcastRequest = components["schemas"]["TestBroadcastRequest"];
 export type TestBroadcastResponse = components["schemas"]["TestBroadcastResponse"];
 export type OpensOverTime = components["schemas"]["OpensOverTime"];
 export type LinkPerformance = components["schemas"]["LinkPerformance"];
 export type BroadcastAnalytics = components["schemas"]["BroadcastAnalytics"];
+
+/** Tag-based targeting for broadcasts */
+export type BroadcastTargeting = {
+	/** Only send to contacts with ANY of these tags. Empty = all active contacts. */
+	includeTags?: string[];
+	/** Exclude contacts with ANY of these tags. */
+	excludeTags?: string[];
+};
+
+/** Request body for sending a broadcast */
+export type SendBroadcastRequest = BroadcastTargeting;
+
+/** Request body for scheduling a broadcast */
+export type ScheduleBroadcastRequest = BroadcastTargeting & {
+	/** ISO 8601 datetime when to send the broadcast */
+	scheduledAt: string;
+};
 
 export type ListBroadcastsOptions = {
 	status?: BroadcastStatus;

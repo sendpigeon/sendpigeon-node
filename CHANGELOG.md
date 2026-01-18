@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.10.0
+
+- Add Contacts API (`contacts.list`, `create`, `batch`, `get`, `update`, `delete`, `unsubscribe`, `resubscribe`, `stats`, `tags`)
+- Add Broadcasts API (`broadcasts.list`, `create`, `get`, `update`, `delete`, `send`, `schedule`, `cancel`, `test`, `recipients`, `analytics`)
+- Broadcast targeting: `includeTags` and `excludeTags` options
+
 ## 1.9.0
 
 - Per-email tracking: `tracking: { opens, clicks }` option in send requests

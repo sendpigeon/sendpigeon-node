@@ -178,8 +178,12 @@ export class SendPigeon {
 				`/v1/broadcasts/${id}/recipients${buildQueryString(opts ?? {})}`,
 			),
 		/** Send a broadcast immediately */
-		send: (id: string) =>
-			this.req<types.Broadcast>("POST", `/v1/broadcasts/${id}/send`),
+		send: (id: string, targeting?: types.SendBroadcastRequest) =>
+			this.req<types.Broadcast>(
+				"POST",
+				`/v1/broadcasts/${id}/send`,
+				targeting ?? {},
+			),
 		/** Schedule a broadcast */
 		schedule: (id: string, data: types.ScheduleBroadcastRequest) =>
 			this.req<types.Broadcast>("POST", `/v1/broadcasts/${id}/schedule`, data),
