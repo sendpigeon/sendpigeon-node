@@ -104,6 +104,61 @@ if (data.warnings) {
 
 Configure organization defaults in Settings → Tracking.
 
+## Contacts
+
+Manage your audience for broadcasts:
+
+```typescript
+// Add a contact (e.g. on signup)
+await pigeon.contacts.create({
+  email: "user@example.com",
+  firstName: "John",
+  tags: ["newsletter"],
+});
+
+// Batch import
+await pigeon.contacts.batch([
+  { email: "a@example.com", tags: ["newsletter"] },
+  { email: "b@example.com", tags: ["newsletter"] },
+]);
+
+// List, filter, search
+await pigeon.contacts.list({ tag: "newsletter", status: "active" });
+```
+
+## Broadcasts
+
+Send emails to your contacts with tag-based targeting. Requires a paid plan.
+
+```typescript
+// 1. Create a broadcast (draft)
+const { data: broadcast } = await pigeon.broadcasts.create({
+  name: "March Newsletter",
+  subject: "What's new",
+  htmlContent: "<h1>Hello!</h1>",
+  fromEmail: "newsletter@yourdomain.com",
+  fromName: "Your Company",
+});
+
+// 2. Send a test
+await pigeon.broadcasts.test(broadcast.id, { email: "you@company.com" });
+
+// 3. Send to contacts with tag targeting
+await pigeon.broadcasts.send(broadcast.id, {
+  includeTags: ["newsletter"],
+  excludeTags: ["uninterested"],
+});
+
+// Or schedule for later
+await pigeon.broadcasts.schedule(broadcast.id, {
+  scheduledAt: "2026-03-10T09:00:00Z",
+  includeTags: ["newsletter"],
+});
+
+// Get analytics (opens, clicks)
+await pigeon.broadcasts.analytics(broadcast.id);
+```
+
 ## Available Methods
 
 ```typescript
@@ -115,12 +170,41 @@ pigeon.sendBatch(emails)
 pigeon.emails.get(id)
 pigeon.emails.cancel(id)
 
+// Contacts
+pigeon.contacts.list(opts?)
+pigeon.contacts.create(data)
+pigeon.contacts.batch(contacts)
+pigeon.contacts.get(id)
+pigeon.contacts.update(id, data)
+pigeon.contacts.delete(id)
+pigeon.contacts.unsubscribe(id)
+pigeon.contacts.resubscribe(id)
+pigeon.contacts.stats()
+pigeon.contacts.tags()
+
+// Broadcasts
+pigeon.broadcasts.list(opts?)
+pigeon.broadcasts.create(data)
+pigeon.broadcasts.get(id)
+pigeon.broadcasts.update(id, data)
+pigeon.broadcasts.delete(id)
+pigeon.broadcasts.duplicate(id)
+pigeon.broadcasts.send(id, targeting?)
+pigeon.broadcasts.schedule(id, data)
+pigeon.broadcasts.cancel(id)
+pigeon.broadcasts.test(id, data)
+pigeon.broadcasts.recipients(id, opts?)
+pigeon.broadcasts.analytics(id)
+
 // Templates
 pigeon.templates.list()
 pigeon.templates.create(data)
 pigeon.templates.get(id)
 pigeon.templates.update(id, data)
 pigeon.templates.delete(id)
+pigeon.templates.publish(id)
+pigeon.templates.unpublish(id)
+pigeon.templates.test(id, data)
 
 // Domains
 pigeon.domains.list()
@@ -133,6 +217,24 @@ pigeon.domains.delete(id)
 pigeon.apiKeys.list()
 pigeon.apiKeys.create({ name, mode?, permission? })
 pigeon.apiKeys.delete(id)
+
+// Suppressions
+pigeon.suppressions.list(opts?)
+pigeon.suppressions.delete(email)
+
+// Tracking
+pigeon.tracking.getDefaults()
+pigeon.tracking.updateDefaults(data)
+
+// Webhooks
+pigeon.webhooks.getConfig()
+pigeon.webhooks.enable(data)
+pigeon.webhooks.update(data)
+pigeon.webhooks.disable()
+pigeon.webhooks.delete()
+pigeon.webhooks.regenerateSecret()
+pigeon.webhooks.test()
+pigeon.webhooks.listDeliveries()
 ```
 
 ## Webhook Verification
